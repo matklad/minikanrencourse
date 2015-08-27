@@ -52,7 +52,7 @@
 
 
 (define (lookupo x env result)
-  (fresh (k v t acc)
+  (fresh (k v t)
          (== `((,k . ,v) . ,t) env)
          (conde
           [(== k x) (== result v)]
@@ -69,12 +69,13 @@
   (conde
    [(== #t expr) (== result #t)]
    [(== #f expr) (== result #f)]
-   [(== `(quote ,result) expr)]
+   [(== `(quote ,result) expr)
+    (absento 'closure result)]
    [(fresh (e1 e2 r1 r2)
            (== `(cons ,e1 ,e2) expr)
+           (== result `(,r1 . ,r2))
            (evalo e1 env r1)
-           (evalo e2 env r2)
-           (== result `(,r1 . ,r2)))]
+           (evalo e2 env r2))]
 
    [(fresh (e1 t)
            (== `(car ,e1) expr)
@@ -89,16 +90,16 @@
            (conde
             [(== '() items) (== result '())]
             [(== `(,h . ,t) items)
+             (== result `(,hr . ,tr))
              (evalo h env hr)
-             (evalo `(list . ,t) env tr)
-             (== result `(,hr . ,tr))]))]
+             (evalo `(list . ,t) env tr)]))]
 
    [(fresh (e1 er)
            (== `(null? ,e1) expr)
-           (evalo e1 env er)
            (conde
             [(== er '()) (== result #t)]
-            [(=/= er '()) (== result #f)]))]
+            [(=/= er '()) (== result #f)])
+           (evalo e1 env er))]
 
    [(fresh (c cr e1 e2)
            (== `(if ,c ,e1 ,e2) expr)

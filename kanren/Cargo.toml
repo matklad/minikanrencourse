@@ -1,0 +1,8 @@
+[package]
+name = "kanren"
+version = "0.1.0"
+authors = ["Aleksey Kladov <aleksey.kladov@gmail.com>"]
+
+
+# [dependencies]
+# cons-list = "0.0.2"
